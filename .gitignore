@@ -1,11 +1,14 @@
 # Local machine configuration and secrets
 env/local.conf
+scpe/env.local
 *.env
 
 # Runtime outputs
 eval_runs/*
 !eval_runs/.gitkeep
 final_eval_data_edited/
+scpe/output/
+scpe/logs/
 **/outputs/
 **/logs/
 *.log
