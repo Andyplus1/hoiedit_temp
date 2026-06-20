@@ -1,6 +1,6 @@
-# HOI-Edit / CR v7 Release Notes
+# HOI-Edit / HOI-Eval / SCPE Release Notes
 
-This repository is a lightweight open-source release assembled from the portable CR v7 evaluation package and the SCPE / ACE I2V pipeline.
+This repository is a lightweight open-source release assembled from the portable HOI-Eval evaluation package and the SCPE / ACE I2V pipeline.
 
 ## Included
 
@@ -8,7 +8,7 @@ This repository is a lightweight open-source release assembled from the portable
 - SCPE prompt templates, QA2 prompts, Wan2.2 wrappers, and Playbook seeds under `scpe/data/`
 - SCPE local setup templates and runner scripts under `scpe/`
 - Evaluation entry scripts: `run_qa_hoi.sh` and `run_eval.sh`
-- CR v7 annotation JSON files under `data_v7/CR/`
+- HOI-Edit annotation JSON files under `data_v7/CR/`
 - QA, HOI, resizing, scoring, and path utility scripts under `evaluation/`
 - SAM2 source code needed by the evaluation wrapper
 - GroundingDINO source code needed by the evaluation wrapper
