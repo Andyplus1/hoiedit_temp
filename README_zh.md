@@ -1,101 +1,161 @@
-# HOI-Edit / CR v7 代码发布
+# HOI-Edit: Human-Object Interaction Editing with SCPE and CR Evaluation
 
-这是 HOI editing 论文代码的临时开源版本，包含两部分：
+这是 HOI editing 论文的代码发布仓库，包含生成与评测两部分：用 **SCPE** 生成 human-object interaction 编辑结果，并用 **CR v7** benchmark 进行 QA + HOI 评测。
 
-- **SCPE generation pipeline**：ACE/Playbook prompt enhancement、Wan2.2 图生视频、QA2 选帧。
-- **CR v7 evaluation pipeline**：CR 标注、Gemini QA、HOI Check、最终 I / S / O / IQA 计分。
+给定一张原图和一条简短 HOI 指令，流程会先用 SCPE 将指令增强为详细 image-to-video prompt，再用 Wan2.2 生成编辑视频，通过 QA2 选出评测帧，最后用 CR v7 的 QA、HOI check 和 I / S / O / IQA 指标评估结果。
 
-> 本仓库是轻量代码发布。API key、原图、编辑帧/视频、模型权重、checkpoint、运行输出均不包含。
+> 这是轻量代码发布。API key、原图、参考视频、生成视频、编辑帧、模型权重、checkpoint 和运行输出均不包含。
 
 English version: [README.md](README.md)
 
 ## News
 
-- **Code release**：提供 SCPE pipeline 与 CR v7 evaluation code。
-- **Lite assets**：包含标注 JSON；大规模图片、视频、权重、checkpoint 需本地自行准备。
+- **Code release**：提供 SCPE generation code 和 CR v7 evaluation code。
+- **Lite benchmark files**：包含 CR v7 annotation JSON。
+- **Local assets required**：图片、视频、Wan2.2 权重、GroundingDINO 权重、SAM2 checkpoint 需本地准备。
 
-## Overview
+## Method Overview
 
 ```text
-短 HOI instruction + 原图
+原图 + 短 HOI instruction
         │
         ▼
-SCPE / ACE prompt enhancement
-        │  scpe/
+SCPE: ACE / Playbook prompt enhancement
+        │
         ▼
 Wan2.2 image-to-video generation
         │
         ▼
-QA2 frame selection / edited frame extraction
+QA2 frame selection
         │
         ▼
 CR v7 evaluation
-        ├─ Phase 1: Gemini QA
-        ├─ Phase 2: HOI check
-        └─ Phase 3: final I / S / O / IQA scoring
+        ├─ Gemini QA
+        ├─ HOI check
+        └─ I / S / O / IQA scoring
 ```
-
-## 论文模块与代码对应
-
-| 论文部分 | 功能 | 代码 / 文件 |
-|---|---|---|
-| SCPE / ACE prompt enhancement | 从失败案例学习 Playbook，并把短 HOI 指令增强为详细 I2V prompt | `scpe/scripts/ace_i2v_official3.py`, `scpe/data/*playbook*`, `scpe/data/ace_prompts_*.json` |
-| Wan2.2 I2V generation | 使用 DashScope 或本地 Wan2.2 A14B 生成视频 | `scpe/scripts/wan22_generate_from_enhanced_prompts.py`, `scpe/scripts/wan22_local_i2v_a14b_generate.py` |
-| QA2 frame selection | 从生成视频中选择最适合下游图像评测的帧 | `scpe/scripts/ace_v2f_qa2.py`, `scpe/data/qa2_prompts_*.json` |
-| CR benchmark annotations | 保存 instruction、HOI tag、生成 QA 问题和计分字段 | `data_v7/CR/*_scoring_final.json` |
-| Edited image inputs | 待评测模型输出或 QA2 选出的帧 | `data_v7/CR/<model>_frames/{L1L2,L3}/` 或 `FRAMES_DIR=/path/to/frames` |
-| Phase 1: QA evaluation | 对 `question_v6` 做 Gemini VQA | `evaluation/run_qa_gemini_question_v6.sh`, `evaluation/run_question_answering.py` |
-| Phase 2: HOI check | 评估交互是否完成，以及主体/客体是否保持 | `evaluation/run_full_eval_v7_google.sh`, `evaluation/gemini3_final_hoicheck_new_noquestion_track_google_newsim.py` |
-| HOI preprocessing | resize、person/object detection、SAM2 tracking | `evaluation/resize_edited_images_to_original.py`, `evaluation/inference_on_multi_image_eval_optimized.py`, `sam2/run_sam2_tracking_for_eval.py` |
-| Final metric table | 合并 QA + HOI，计算 I / S / O / IQA | `evaluation/compute_scoring_final_scores.py` |
-| 一键评测入口 | 串联 QA、HOI、计分 | `run_eval.sh` |
 
 ## 目录结构
 
 ```text
 .
 ├── scpe/                      # SCPE generation pipeline
+│   ├── scripts/               # ACE、Wan2.2 generation、QA2 frame selection
+│   ├── data/                  # Playbook seeds 和 prompt templates
+│   ├── run_minimal.sh         # SCPE 一键运行入口
+│   ├── env.example            # SCPE 本地配置模板
+│   └── README.md              # SCPE 详细说明
 ├── run_eval.sh                # CR evaluation: QA + HOI + final scoring
 ├── run_qa_hoi.sh              # CR evaluation: QA + HOI only
-├── data_v7/CR/                # CR 标注 JSON
+├── data_v7/CR/                # CR annotation JSON
 ├── evaluation/                # QA、HOI、预处理、计分脚本
 ├── sam2/                      # SAM2 tracking code
 ├── third_party/GroundingDINO/ # GroundingDINO code
-├── env/                       # evaluation 配置模板和依赖
-└── eval_runs/                 # 评测输出
+└── env/                       # CR evaluation 配置模板和依赖
 ```
 
-## SCPE 快速开始
+## SCPE 环境配置
 
-完整说明见 [scpe/README.md](scpe/README.md)。最小用法：
+SCPE 位于 [scpe/](scpe)。它使用 Gemini 完成 ACE / Playbook 学习与 QA2，可通过 DashScope Wan2.2 I2V 或本地 Wan2.2 I2V A14B 生成视频。
 
 ```bash
 cd scpe
-cp env.example env.local
-# 编辑 env.local: GEMINI_API_KEY，可选 DASHSCOPE_API_KEY、DATA_ROOT、WAN22 路径
 
+# 创建 Python 环境并安装依赖
+./setup_env.sh
+
+# 创建本地配置。不要提交 env.local。
+cp env.example env.local
+```
+
+编辑 `scpe/env.local`：
+
+```bash
+export GEMINI_API_KEY="your-gemini-api-key"
+
+# 仅 DashScope backend 需要
+export DASHSCOPE_API_KEY="your-dashscope-api-key"
+
+# cn 或 en，控制 prompt / Playbook 模板语言
+export ACE_LANG="cn"
+
+# 数据根目录：标注、原图、epoch0 参考视频
+export DATA_ROOT="/path/to/CameraReady"
+
+# 仅本地 Wan2.2 backend 需要
+export WAN22_REPO="/path/to/Wan2.2"
+export WAN22_CKPT_DIR="/path/to/Wan2.2-I2V-A14B"
+```
+
+`DATA_ROOT` 应为：
+
+```text
+DATA_ROOT/
+├── collected_annotations_bboxes_v7_L1L2_questions.json
+├── collected_annotations_bboxes_v7_L3_questions.json
+├── data_v7_L12/
+├── data_v7_L3/
+├── epoch_0_L1L2/
+└── epoch_0_L3/
+```
+
+## SCPE 运行
+
+最小端到端运行：
+
+```bash
+cd scpe
+source env.local
+
+# 调试：每个 split 跑 2 条
 LIMIT=2 ./run_minimal.sh all
 ```
 
-常用 SCPE 命令：
+分阶段运行：
 
 ```bash
-./run_minimal.sh learn      # 从 epoch0 参考视频学习 Playbook
-./run_minimal.sh enhance    # 生成 enhanced prompts
+./run_minimal.sh learn      # 从 epoch0 参考视频学习 / 更新 Playbook
+./run_minimal.sh enhance    # 由原图 + instruction 生成 enhanced prompts
 ./run_minimal.sh wan22      # 用 Wan2.2 生成视频
-./run_minimal.sh qa2        # 从生成视频选帧/评估
+./run_minimal.sh qa2        # 从生成视频中选帧
+```
+
+使用本地 Wan2.2 A14B：
+
+```bash
 WAN22_BACKEND=local ./run_minimal.sh wan22
 ```
 
-## CR Evaluation 快速开始
+常用续跑 / 调试：
 
-创建本地评测配置：
+```bash
+SKIP_LEARN=1 ./run_minimal.sh enhance
+SKIP_QA2=1 ./run_minimal.sh all
+FORCE_REGEN=1 ./run_minimal.sh wan22
+ACE_LANG=en ./run_minimal.sh all
+```
+
+SCPE 输出：
+
+```text
+scpe/output/
+├── playbook.json
+├── playbook_normalized.json
+├── enhanced_prompts.json
+├── wan22_videos/             # DashScope backend
+├── wan22_local_a14b/         # local Wan2.2 backend
+└── qa2_frames/
+```
+
+## CR v7 Evaluation 环境配置
+
+创建本地配置：
 
 ```bash
 cp env/local.conf.example env/local.conf
 ```
 
-填写：
+编辑 `env/local.conf`：
 
 ```bash
 export DINO_ENV_PY="/path/to/conda/envs/cr-dino/bin/python"
@@ -105,7 +165,26 @@ export GEMINI_API_KEY="your-gemini-api-key"
 export GPU_ID="0"
 ```
 
-完整 CR 评测：
+完整评测使用三个环境：
+
+| 环境 | 用途 | 依赖 |
+|---|---|---|
+| `cr-dino` | GroundingDINO detection | `env/requirements-dino.txt` |
+| `cr-sam2` | SAM2 tracking | `env/requirements-sam2.txt` |
+| `cr-gemini` | Gemini QA + HOI check + scoring | `env/requirements-hoi-google.txt` |
+
+依赖说明见 [env/requirements/README.md](env/requirements/README.md)。
+
+## CR v7 Evaluation 运行
+
+把编辑帧放在：
+
+```text
+data_v7/CR/<model_name>_frames/L1L2/
+data_v7/CR/<model_name>_frames/L3/
+```
+
+然后运行：
 
 ```bash
 MODELS=<model_name> GPU_ID=0 bash run_eval.sh
@@ -119,6 +198,27 @@ FRAMES_DIR=/path/to/frames MODELS=<model_name> bash run_eval.sh
 
 `FRAMES_DIR` 下应包含 `L1L2/` 和 `L3/`。
 
+部分流程：
+
+```bash
+SKIP_HOI=1 MODELS=<model_name> bash run_qa_hoi.sh
+SKIP_QA=1 MODELS=<model_name> GPU_ID=0 bash run_qa_hoi.sh
+SCORES_ONLY=1 SCORE_MODEL=<model_name> bash run_eval.sh
+```
+
+## 论文模块与代码对应
+
+| 论文部分 | 代码 / 文件 |
+|---|---|
+| SCPE / ACE prompt enhancement | `scpe/scripts/ace_i2v_official3.py`, `scpe/data/*playbook*`, `scpe/data/ace_prompts_*.json` |
+| Wan2.2 I2V generation | `scpe/scripts/wan22_generate_from_enhanced_prompts.py`, `scpe/scripts/wan22_local_i2v_a14b_generate.py` |
+| QA2 frame selection | `scpe/scripts/ace_v2f_qa2.py`, `scpe/data/qa2_prompts_*.json` |
+| CR annotations | `data_v7/CR/*_scoring_final.json` |
+| Gemini QA evaluation | `evaluation/run_qa_gemini_question_v6.sh`, `evaluation/run_question_answering.py` |
+| HOI check | `evaluation/run_full_eval_v7_google.sh`, `evaluation/gemini3_final_hoicheck_new_noquestion_track_google_newsim.py` |
+| HOI preprocessing | `evaluation/resize_edited_images_to_original.py`, `evaluation/inference_on_multi_image_eval_optimized.py`, `sam2/run_sam2_tracking_for_eval.py` |
+| Final scoring | `evaluation/compute_scoring_final_scores.py` |
+
 ## 需要本地补充的资源
 
 | 资源 | 放置路径 |
@@ -128,21 +228,16 @@ FRAMES_DIR=/path/to/frames MODELS=<model_name> bash run_eval.sh
 | CR 评测编辑帧 | `data_v7/CR/<model>_frames/L1L2/`, `data_v7/CR/<model>_frames/L3/` |
 | GroundingDINO weight | `third_party/GroundingDINO/weights/groundingdino_swint_ogc.pth` |
 | SAM2 checkpoint | `sam2/checkpoints/sam2.1_hiera_large.pt` |
-| SCPE 参考视频 / 原图 | 由 `scpe/env.local` 中 `DATA_ROOT` 配置 |
+| SCPE 参考视频 / 原图 | 由 `scpe/env.local` 的 `DATA_ROOT` 配置 |
 | 本地 Wan2.2 仓库和权重 | 由 `WAN22_REPO` 和 `WAN22_CKPT_DIR` 配置 |
 
-## 输出
+## 评测输出与指标
 
 | 输出 | 路径 |
 |---|---|
-| SCPE enhanced prompts | `scpe/output/enhanced_prompts.json` |
-| SCPE 生成视频 | `scpe/output/wan22_videos/` 或 `scpe/output/wan22_local_a14b/` |
-| QA2 选帧 | `scpe/output/qa2_frames/` |
 | CR QA 结果 | `eval_runs/qa_results_v6_{L1L2,L3}_<model>.json` |
 | CR HOI 结果 | `eval_runs/<model>_{L1L2,L3}_full/.../results_*_google_full.json` |
 | 最终分数表 | `eval_runs/scoring_final_scores_4dp.json` |
-
-## 指标
 
 `evaluation/compute_scoring_final_scores.py` 合并 HOI 和 QA 输出：
 
@@ -156,6 +251,6 @@ FRAMES_DIR=/path/to/frames MODELS=<model_name> bash run_eval.sh
 
 ## 说明
 
-- `env/workspace.conf` 会按仓库根目录自动解析评测路径。
-- `env/local.conf` 和 `scpe/env.local` 被 git ignore，因为它们包含本机路径和 API key。
+- `env/local.conf` 和 `scpe/env.local` 被 git ignore，因为它们包含本地路径和 API key。
+- `scpe/output/`、`scpe/logs/`、`eval_runs/` 是运行输出，默认忽略。
 - release 范围和第三方代码说明见 [RELEASE_NOTES.md](RELEASE_NOTES.md) 与 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
