@@ -14,11 +14,15 @@ scpe/logs/
 *.log
 
 # User-provided data and generated frames
+data/data_v7_L12/
+data/data_v7_L3/
+data/*_frames/
 data_v7/CR/*_frames/
 data_v7/CR/data_v7_L12/
 data_v7/CR/data_v7_L3/
 
 # Large model weights/checkpoints
+weights/
 *.pth
 *.pt
 *.ckpt

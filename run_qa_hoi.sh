@@ -5,7 +5,7 @@
 # 用法:
 #   cp env/local.conf.example env/local.conf   # 配置 Python 路径与 GEMINI_API_KEY
 #   export GEMINI_API_KEY='your-key'           # 或在 local.conf 中设置
-#   GPU_ID=0 bash run_qa_hoi.sh
+#   MODELS=your_model_name bash run_qa_hoi.sh
 #
 # 常用:
 #   MODELS=your_model_name bash run_qa_hoi.sh
@@ -123,7 +123,7 @@ fi
 
 if [[ -z "${MODELS// /}" ]]; then
   log "❌ MODELS 未设置。请指定模型名，例如: MODELS=your_model_name bash run_qa_hoi.sh"
-  log "   编辑图默认目录: data_v7/CR/<your_model_name>_frames/{L1L2,L3}/"
+  log "   编辑图默认目录: data/<your_model_name>_frames/{L1L2,L3}/"
   log "   或设置 FRAMES_DIR=/path/to/frames 覆盖编辑图根目录"
   exit 1
 fi

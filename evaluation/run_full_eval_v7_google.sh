@@ -9,7 +9,7 @@ source "${_WS_ROOT}/env/workspace.conf"
 
 # ============================================
 # 通用评测流程 - V7 L3 数据（Google 官方 Gemini API 版本）
-# V7：EVAL_V7_IMAGE_DIR、EVAL_V7_JSON 必填；EVAL_V7_ORIG_DIR 默认 data_v7/new_results_v7_original_flat
+# V7：EVAL_V7_IMAGE_DIR、EVAL_V7_JSON 必填；EVAL_V7_ORIG_DIR 由调用脚本设置
 # 支持所有模型：qwen_plus, nanobanana, 等
 # 支持数据集类型：L1L2, L3
 # HOI Check：google.genai SDK + gemini-2.5-pro（gemini3_*_google_newsim.py）
@@ -24,7 +24,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=cr_proxy_defaults.sh
 source "${SCRIPT_DIR}/cr_proxy_defaults.sh"
 apply_cr_proxy_if_unset
-# CUDA_VISIBLE_DEVICES 将在参数解析后设置（默认值为4）
+# CUDA_VISIBLE_DEVICES 将在参数解析后设置
 
 # --------------------------
 # 环境配置
@@ -77,11 +77,11 @@ SKIP_CONVERT=0
 SKIP_RESIZE=0  # 如果为1，则跳过图像缩放步骤
 RESIZE_INPLACE=0  # 如果为1，则在原图像路径下直接resize（覆盖原图像）
 HOI_CHECK_ONLY=0  # 如果为1，则跳过所有前面的步骤，直接执行HOI Check
-GPU_ID=0  # 默认GPU ID为4
+GPU_ID=0
 RUN_BACKGROUND=0  # 如果为1，则在后台运行（使用nohup）
 LOG_FILE=""  # 日志文件路径（后台运行时使用）
 OUTPUT_DIR=""  # 指定输出目录（如果不指定，则使用时间戳）
-CR_WAN22_QA2_L1L2=0  # data_v7/CR wan22 qa2 frames + L1L2 questions
+CR_WAN22_QA2_L1L2=0  # data/ wan22 qa2 frames + L1L2 questions
 PRE_CONVERT_FRAMES_ROOT=""  # 非空时在主流程前对整棵 frames 目录做 *_edited.png 规范化
 
 usage() {
@@ -99,12 +99,12 @@ usage() {
   echo "  --resize-inplace       在原图像路径下直接resize（覆盖原图像）"
   echo "  --hoi-check-only       直接执行HOI Check步骤（跳过所有前面的步骤）"
   echo "  --use-optimized-dino   使用优化版DINO脚本（只加载一次模型，速度更快）"
-  echo "  --gpu-id ID           指定CUDA_VISIBLE_DEVICES的GPU ID (默认: 4)"
+  echo "  --gpu-id ID           指定CUDA_VISIBLE_DEVICES的GPU ID (默认: 0)"
   echo "  --background          在后台运行（使用nohup，输出到日志文件）"
   echo "  --log-file FILE       指定日志文件路径（默认: output_<MODEL>_v7_google.log）"
   echo "  --output-dir DIR      指定输出目录（默认: 使用时间戳创建新目录）"
   echo "                        例如: --output-dir runs/20251114_005019"
-  echo "  --cr-wan22-qa2-l1l2   预设: data_v7/CR wan22_official3_enhanced_qa2_frames/L1L2"
+  echo "  --cr-wan22-qa2-l1l2   预设: data/wan22_official3_enhanced_qa2_frames/L1L2"
   echo "                        + collected_annotations_bboxes_v7_L1L2_questions_scoring_final.json"
   echo "                        （先对 frames 根目录做 jpg→*_edited.png，再跑 V7 评测）"
   echo ""
@@ -222,7 +222,7 @@ done
 
 # CR wan22 qa2 L1L2 预设路径
 if [[ ${CR_WAN22_QA2_L1L2} -eq 1 ]]; then
-  DATA_V7_CR="${SHARED_DIR}/data_v7/CR"
+  DATA_V7_CR="${DATA_V7_CR:-${HOI_EDIT_DATA_DIR:-${SHARED_DIR}/data}}"
   PRE_CONVERT_FRAMES_ROOT="${DATA_V7_CR}/wan22_official3_enhanced_qa2_frames"
   export EVAL_V7_IMAGE_DIR="${PRE_CONVERT_FRAMES_ROOT}/L1L2"
   export EVAL_V7_JSON="${DATA_V7_CR}/collected_annotations_bboxes_v7_L1L2_questions_scoring_final.json"
@@ -977,4 +977,3 @@ for dataset_type in "${DATASET_ARRAY[@]}"; do
   echo "  - ${path_suffix} 结果: ${OUTPUT_JSON}"
 done
 echo ""
-

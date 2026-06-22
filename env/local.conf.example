@@ -8,6 +8,12 @@
 # ---------- GroundingDINO ----------
 export GROUNDING_DINO_ROOT="${EVAL_WORKSPACE}/third_party/GroundingDINO"
 
+# ---------- HOI-Edit data / weights ----------
+export HOI_EDIT_DATA_DIR="${EVAL_WORKSPACE}/data"
+export WEIGHTS_DIR="${EVAL_WORKSPACE}/weights"
+export GROUNDING_DINO_CHECKPOINT="${WEIGHTS_DIR}/groundingdino_swint_ogc.pth"
+export SAM2_CHECKPOINT="${WEIGHTS_DIR}/sam2.1_hiera_large.pt"
+
 # ---------- Python 解释器（三个 conda 环境，见 env/requirements/）----------
 export DINO_ENV_PY="/path/to/conda/envs/cr-dino/bin/python"
 export SS_ENV_PY="/path/to/conda/envs/cr-sam2/bin/python"

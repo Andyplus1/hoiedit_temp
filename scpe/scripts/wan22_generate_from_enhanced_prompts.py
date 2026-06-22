@@ -26,7 +26,9 @@ import requests
 from dashscope import VideoSynthesis
 from tqdm import tqdm
 
-DEFAULT_CR = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SCPE_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_DATA_ROOT = Path(os.getenv("DATA_ROOT", REPO_ROOT / "data"))
 
 PROMPT_PREFIX = "The camera is fixed and the person is the only one in the frame. "
 PROMPT_SUFFIX = " With no other person's additional movements."
@@ -258,28 +260,28 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--enhanced-prompts-json",
         type=Path,
-        default=DEFAULT_CR / "enhanced_prompts_v7_official3.json",
+        default=SCPE_ROOT / "data/enhanced_prompts_v7_official3.json",
         help="by_split 或扁平 enhanced_prompts JSON。",
     )
     p.add_argument(
         "--image-dir-l1l2",
         type=Path,
-        default=DEFAULT_CR / "data_v7_L12",
+        default=DEFAULT_DATA_ROOT / "data_v7_L12",
     )
     p.add_argument(
         "--image-dir-l3",
         type=Path,
-        default=DEFAULT_CR / "data_v7_L3",
+        default=DEFAULT_DATA_ROOT / "data_v7_L3",
     )
     p.add_argument(
         "--output-dir-l1l2",
         type=Path,
-        default=DEFAULT_CR / "wan22_videos_official3_enhanced/L1L2",
+        default=SCPE_ROOT / "output/wan22_videos_official3_enhanced/L1L2",
     )
     p.add_argument(
         "--output-dir-l3",
         type=Path,
-        default=DEFAULT_CR / "wan22_videos_official3_enhanced/L3",
+        default=SCPE_ROOT / "output/wan22_videos_official3_enhanced/L3",
     )
     p.add_argument(
         "--split",
@@ -308,7 +310,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--summary-json",
         type=Path,
-        default=DEFAULT_CR / "wan22_videos_official3_enhanced/run_summary.json",
+        default=SCPE_ROOT / "output/wan22_videos_official3_enhanced/run_summary.json",
     )
     p.add_argument(
         "--manifest",

@@ -320,7 +320,10 @@ def main():
 
     ws = args.workspace.resolve()
     legacy = args.legacy_root.resolve() if args.legacy_root else None
-    cr = ws / "data_v7/CR"
+    cr = Path(os.environ.get("HOI_EDIT_DATA_DIR", str(ws / "data"))).resolve()
+    if not cr.exists():
+        legacy_cr = ws / "data_v7/CR"
+        cr = legacy_cr if legacy_cr.exists() else cr
 
     l1l2 = load_json(cr / "collected_annotations_bboxes_v7_L1L2_questions_scoring_final.json")
     l3 = load_json(cr / "collected_annotations_bboxes_v7_L3_questions_scoring_final.json")

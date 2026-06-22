@@ -363,7 +363,7 @@ def save_playbook(filepath: str, playbook: Dict[str, List[str]]):
         print(f"   ❗ 保存 Playbook 失败: {e}")
 
 
-# --- Playbook 整理（同 CameraReady/process_playbook.py）---
+# --- Playbook 整理 ---
 
 PITFALL_MOVE_RE = re.compile(
     r"为防止|以防止|防止|以避免|避免模型|"
@@ -1046,7 +1046,7 @@ async def main():
         "--dataset",
         choices=["data_v7_12", "data_v7_3"],
         default=None,
-        help="使用 CameraReady 预设：data_v7_12（子集 1+2）或 data_v7_3（子集 3），见 paths_data_v7.py。",
+        help="使用 data 预设：data_v7_12（子集 1+2）或 data_v7_3（子集 3），见 paths_data_v7.py。",
     )
     parser.add_argument(
         "--mode",
@@ -1155,7 +1155,7 @@ async def main():
         print("❗ GEMINI_API_KEY 未设置或客户端初始化失败，退出。")
         return
 
-    # 2. 解析路径（--dataset 使用 CameraReady/data_v7_12 或 data_v7_3 预设）
+    # 2. 解析路径（--dataset 使用 data/data_v7_L12 或 data/data_v7_L3 预设）
     if args.dataset:
         from paths_data_v7 import ensure_output_dirs, get_data_v7_paths
 

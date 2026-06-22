@@ -40,7 +40,7 @@ cp env/local.conf.example env/local.conf
 **Bundled in this release / 发布包内已包含：**
 
 - Source: `third_party/GroundingDINO/`
-- Weights: `third_party/GroundingDINO/weights/groundingdino_swint_ogc.pth`
+- Weights: `weights/groundingdino_swint_ogc.pth`
 - Config: `third_party/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py`
 - Called by: `evaluation/inference_on_multi_image_eval_optimized.py`
 
@@ -72,7 +72,7 @@ python -c "import torch; from groundingdino.models import build_model; print('OK
 **Bundled in this release / 发布包内已包含：**
 
 - Source: `sam2/`
-- Weights: `sam2/checkpoints/sam2.1_hiera_large.pt`
+- Weights: `weights/sam2.1_hiera_large.pt`
 - Called by: `sam2/run_sam2_tracking_for_eval.py`
 
 ```bash
@@ -88,7 +88,7 @@ export SS_ENV_PY="$CONDA_PREFIX/bin/python"
 
 If checkpoint is missing / 若权重缺失:
 ```bash
-bash sam2/checkpoints/download_ckpts.sh
+# Download from ASSETS.md and place it at weights/sam2.1_hiera_large.pt.
 ```
 
 ---

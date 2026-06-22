@@ -30,7 +30,7 @@ if [[ -f "${ROOT}/env.local" ]]; then
   # shellcheck source=/dev/null
   source "${ROOT}/env.local"
 fi
-DATA_ROOT="${DATA_ROOT:-$(cd "${ROOT}/../CameraReady" && pwd)}"
+DATA_ROOT="${DATA_ROOT:-$(cd "${ROOT}/../data" && pwd)}"
 
 PYTHON="${PYTHON:-}"
 if [[ -z "$PYTHON" ]]; then

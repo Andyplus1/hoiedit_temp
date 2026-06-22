@@ -12,17 +12,18 @@ Download:
 SHA256:
 
 ```text
-6a0b5959712f2fb7e8a602ee3539ec171478ba5a54dbc4c385455a212e6ba9df  hoi_edit_assets_v7.tar.gz
+387f10b42883e6a00539064389c2adcb74b5e438ea53373cae83f5a5a5bfcb8e  hoi_edit_assets_v7.tar.gz
 ```
 
 ## Contents
 
 | Asset | Size | Count / file | Expected path after extraction |
 |---|---:|---:|---|
-| HOI-Edit L1/L2 original images | 476 MB | 499 images | `data_v7/CR/data_v7_L12/` |
-| HOI-Edit L3 original images | 126 MB | 143 images | `data_v7/CR/data_v7_L3/` |
-| GroundingDINO weight | 694 MB | `groundingdino_swint_ogc.pth` | `third_party/GroundingDINO/weights/` |
-| SAM2 checkpoint | 898 MB | `sam2.1_hiera_large.pt` | `sam2/checkpoints/` |
+| HOI-Edit annotations | small | 2 JSON files | `data/` |
+| HOI-Edit L1/L2 original images | 476 MB | 499 images | `data/data_v7_L12/` |
+| HOI-Edit L3 original images | 126 MB | 143 images | `data/data_v7_L3/` |
+| GroundingDINO weight | 694 MB | `groundingdino_swint_ogc.pth` | `weights/` |
+| SAM2 checkpoint | 898 MB | `sam2.1_hiera_large.pt` | `weights/` |
 
 Checkpoint SHA256:
 
@@ -34,7 +35,7 @@ Checkpoint SHA256:
 ## Notes
 
 - The GitHub repository keeps code and annotation JSON files only.
-- `data_v7/CR/data_v7_L12/`, `data_v7/CR/data_v7_L3/`, `third_party/GroundingDINO/weights/`, and `sam2/checkpoints/` are ignored by git.
+- `data/data_v7_L12/`, `data/data_v7_L3/`, `data/*_frames/`, and `weights/` are ignored by git.
 - Download `hoi_edit_assets_v7.tar.gz` and extract it at the repository root:
 
 ```bash

@@ -42,7 +42,7 @@ check "DINO infer" "[[ -f '${EVAL_DIR}/inference_on_multi_image_eval_optimized.p
 check "SAM2 tracking" "[[ -f '${SAM2_ROOT}/run_sam2_tracking_for_eval.py' ]]"
 
 # 模型权重
-check "GroundingDINO weights" "[[ -f '${GROUNDING_DINO_ROOT}/weights/groundingdino_swint_ogc.pth' ]]"
+check "GroundingDINO weights" "[[ -f '${GROUNDING_DINO_CHECKPOINT}' ]]"
 check "SAM2 checkpoint" "[[ -f '${SAM2_CHECKPOINT}' ]]"
 
 # 依赖库

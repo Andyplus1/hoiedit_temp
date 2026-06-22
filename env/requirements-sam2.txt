@@ -12,5 +12,4 @@ hydra-core
 iopath
 
 # SAM2 权重 (~900MB):
-#   cd sam2/checkpoints && bash download_ckpts.sh
-# 或手动下载 sam2.1_hiera_large.pt 到 sam2/checkpoints/
+#   从 ASSETS.md 下载并放到 weights/sam2.1_hiera_large.pt

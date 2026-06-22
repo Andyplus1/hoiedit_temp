@@ -509,7 +509,7 @@ def main() -> None:
 
     wan_repo = (args.wan_repo or default_wan_repo()).expanduser().resolve()
     ckpt_dir = (args.ckpt_dir or default_ckpt_dir()).expanduser().resolve()
-    data_root = Path(os.getenv("DATA_ROOT", str(REPO_ROOT / "CameraReady"))).expanduser().resolve()
+    data_root = Path(os.getenv("DATA_ROOT", str(REPO_ROOT / "data"))).expanduser().resolve()
 
     image_l1l2 = (
         args.image_dir_l1l2.expanduser().resolve()

@@ -9,6 +9,10 @@ from PIL import Image, ImageDraw, ImageFont
 
 # 添加 GroundingDINO 路径到 sys.path
 GROUNDING_DINO_PATH = os.environ.get("GROUNDING_DINO_ROOT", "")
+GROUNDING_DINO_CHECKPOINT = os.environ.get(
+    "GROUNDING_DINO_CHECKPOINT",
+    os.path.join(GROUNDING_DINO_PATH, "weights/groundingdino_swint_ogc.pth"),
+)
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
@@ -82,7 +86,7 @@ def parse_args():
     parser.add_argument(
         "--weights-file",
         type=str,
-        default=os.path.join(os.environ.get("GROUNDING_DINO_ROOT", ""), "weights/groundingdino_swint_ogc.pth"),
+        default=GROUNDING_DINO_CHECKPOINT,
         help="模型权重文件路径"
     )
     
@@ -406,4 +410,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
