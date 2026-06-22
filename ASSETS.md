@@ -4,18 +4,15 @@ Large assets are not committed to GitHub. They should be downloaded separately a
 
 ## Baidu Netdisk
 
-TODO: add Baidu Netdisk share link after upload.
+Download:
 
-Suggested package to upload:
-
-```text
-cr_eval_release_v7.tar.gz
-```
+- Link: https://pan.baidu.com/s/1XBGmKSqbz_j8q2Tjkxaghg
+- Extraction code: `vx45`
 
 SHA256:
 
 ```text
-9aca70099d4d66d4a253315151585280b6a9b05f5c580f995521bf7d13b9d0fb  cr_eval_release_v7.tar.gz
+6a0b5959712f2fb7e8a602ee3539ec171478ba5a54dbc4c385455a212e6ba9df  hoi_edit_assets_v7.tar.gz
 ```
 
 ## Contents
@@ -38,4 +35,8 @@ Checkpoint SHA256:
 
 - The GitHub repository keeps code and annotation JSON files only.
 - `data_v7/CR/data_v7_L12/`, `data_v7/CR/data_v7_L3/`, `third_party/GroundingDINO/weights/`, and `sam2/checkpoints/` are ignored by git.
-- Uploading to Baidu Netdisk requires a logged-in Baidu Netdisk client or CLI authorization. This environment currently has no `bypy` or Baidu Netdisk CLI configured.
+- Download `hoi_edit_assets_v7.tar.gz` and extract it at the repository root:
+
+```bash
+tar -xzf hoi_edit_assets_v7.tar.gz
+```
